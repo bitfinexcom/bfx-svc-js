@@ -6,6 +6,8 @@ const { spawnSync, spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
+const _ = require('lodash')
+
 const servicename = 'bfx-util-foo-js'
 const target = 'tmp'
 const serviceHome = `${target}/${servicename}`
@@ -26,11 +28,17 @@ const serviceLookupKey = servicename
   .replace(/-js$/, '')
   .replace(/-/, ':')
 
+const serviceLocApiName = _.camelCase(
+  servicename.replace(/-js$/, '')
+).replace(/^bfx/, '')
+
+
 console.log('Setting service up with:')
 console.log('port:', port)
 console.log('workername:', workername)
 console.log('configFileName:', configFileName)
 console.log('serviceLookupKey:', serviceLookupKey)
+console.log('serviceLocApiName:', serviceLocApiName)
 console.log('')
 
 const parentRepo = 'https://github.com/bitfinexcom/bfx-svc-js'
@@ -105,11 +113,17 @@ console.log('Done!')
 const exampleJsFile = path.join(serviceHome, 'scaffold', 'example.js.tmpl')
 const exampleJsTxt = fs.readFileSync(exampleJsFile, 'utf8')
 const exampleJsSubst = exampleJsTxt.replace('__SERVICE__', serviceLookupKey)
-
-fs.writeFileSync(path.join(serviceHome, 'example.js'), exampleTxt, 'utf8')
-
+fs.writeFileSync(path.join(serviceHome, 'example.js'), exampleJsSubst, 'utf8')
 
 
+const exampleLocApiFile = path.join(serviceHome, 'scaffold', 'loc.api.js.tmpl')
+const exampleLocApiTxt = fs.readFileSync(exampleLocApiFile, 'utf8')
+const exampleLocApiSubst = exampleJsTxt.replace('__CLASSNAME__', serviceLocApiName)
+fs.writeFileSync(path.join(serviceHome, 'example.js'), exampleJsSubst, 'utf8')
+
+
+console.log('')
+console.log('All set up!')
 console.log(`To test the new service, start two grapes:
 
 grape --dp 20001 --aph 30001 --bn '127.0.0.1:20002'
