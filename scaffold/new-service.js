@@ -32,6 +32,18 @@ const serviceLocApiName = _.camelCase(
   servicename.replace(/-js$/, '')
 ).replace(/^bfx/, '')
 
+const baseNamesTmp = servicename
+  .replace(/^bfx-/, '')
+  .replace(/-js$/, '-api')
+  .split('-')
+
+const baseClassFileName = baseNamesTmp[1] + '.' + baseNamesTmp[0] + '.js'
+
+const wrkClassName = 'Wrk' + serviceLocApiName + 'Api'
+
+// WrkUtilNetApi  / __WORKERCLASSNAME__
+// '__CONFIG1__', '__CONFIG_2__' 'util.net', 'util'
+// '__API_PATH__' 'net.util'
 
 console.log('Setting service up with:')
 console.log('port:', port)
@@ -39,6 +51,8 @@ console.log('workername:', workername)
 console.log('configFileName:', configFileName)
 console.log('serviceLookupKey:', serviceLookupKey)
 console.log('serviceLocApiName:', serviceLocApiName)
+console.log('baseClassFileName:', baseClassFileName)
+console.log()
 console.log('')
 
 const parentRepo = 'https://github.com/bitfinexcom/bfx-svc-js'
@@ -112,14 +126,34 @@ console.log('Done!')
 
 const exampleJsFile = path.join(serviceHome, 'scaffold', 'example.js.tmpl')
 const exampleJsTxt = fs.readFileSync(exampleJsFile, 'utf8')
-const exampleJsSubst = exampleJsTxt.replace('__SERVICE__', serviceLookupKey)
+const exampleJsSubst = exampleJsTxt.replace(/__SERVICE__/ig, serviceLookupKey)
 fs.writeFileSync(path.join(serviceHome, 'example.js'), exampleJsSubst, 'utf8')
 
+
+fs.mkdirSync(path.join(serviceHome, 'workers'))
+fs.mkdirSync(path.join(serviceHome, 'workers', 'loc.api'))
 
 const exampleLocApiFile = path.join(serviceHome, 'scaffold', 'loc.api.js.tmpl')
 const exampleLocApiTxt = fs.readFileSync(exampleLocApiFile, 'utf8')
-const exampleLocApiSubst = exampleJsTxt.replace('__CLASSNAME__', serviceLocApiName)
-fs.writeFileSync(path.join(serviceHome, 'example.js'), exampleJsSubst, 'utf8')
+const exampleLocApiSubst = exampleLocApiTxt.replace(/__CLASSNAME__/ig, serviceLocApiName)
+const exampleLocFileLoc = path.join(serviceHome, 'workers', 'loc.api', baseClassFileName)
+fs.writeFileSync(exampleLocFileLoc, exampleLocApiSubst, 'utf8')
+
+const exampleApiWrkFile = path.join(serviceHome, 'scaffold', 'api.wrk.js.tmpl')
+const exampleApiWrkTxt = fs.readFileSync(exampleApiWrkFile, 'utf8')
+const exampleApiWrkSubst = exampleApiWrkTxt
+  .replace(/__WORKERCLASSNAME__/ig, wrkClassName)
+  .replace(/__CONFIG1__/ig, configFileName.replace('.json', ''))
+  .replace(/__CONFIG_2__/ig, configFileName.split('.')[0])
+  .replace(/__API_PATH__/ig, baseClassFileName.replace('.js', ''))
+
+const exampleApiWrkLoc = path.join(serviceHome, 'workers', wrkClassName)
+fs.writeFileSync(exampleApiWrkLoc, exampleApiWrkSubst, 'utf8')
+
+
+// WrkUtilNetApi  / __WORKERCLASSNAME__
+// '__CONFIG1__', '__CONFIG_2__' 'util.net', 'util'
+// '__API_PATH__' 'net.util'
 
 
 console.log('')
