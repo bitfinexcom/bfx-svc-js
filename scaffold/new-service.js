@@ -41,10 +41,6 @@ const baseClassFileName = baseNamesTmp[1] + '.' + baseNamesTmp[0] + '.js'
 
 const wrkClassName = 'Wrk' + serviceLocApiName + 'Api'
 
-// WrkUtilNetApi  / __WORKERCLASSNAME__
-// '__CONFIG1__', '__CONFIG_2__' 'util.net', 'util'
-// '__API_PATH__' 'net.util'
-
 console.log('Setting service up with:')
 console.log('port:', port)
 console.log('workername:', workername)
@@ -52,7 +48,6 @@ console.log('configFileName:', configFileName)
 console.log('serviceLookupKey:', serviceLookupKey)
 console.log('serviceLocApiName:', serviceLocApiName)
 console.log('baseClassFileName:', baseClassFileName)
-console.log()
 console.log('')
 
 const parentRepo = 'https://github.com/bitfinexcom/bfx-svc-js'
@@ -69,7 +64,15 @@ console.log(`Added ${serviceHome} as upstream to git repo`)
 
 
 console.log(`Installing npm dependencies, this may take some time...`)
-// spawnCmd('npm', [ 'i' ], { cwd: serviceHome })
+spawnCmd('npm', [ 'i' ], { cwd: serviceHome })
+
+const grenacheDeps = [
+  'https://github.com/bitfinexcom/bfx-wrk-api.git',
+  'https://github.com/bitfinexcom/bfx-facs-api.git',
+  'https://github.com/bitfinexcom/bfx-facs-grc.git'
+]
+
+spawnCmd('npm', [ 'i', '--save' ].concat(grenacheDeps), { cwd: serviceHome })
 
 // TODO: more elaborate README creation with template
 console.log('Adding infos to README.md...')
@@ -146,14 +149,11 @@ const exampleApiWrkSubst = exampleApiWrkTxt
   .replace(/__CONFIG1__/ig, configFileName.replace('.json', ''))
   .replace(/__CONFIG_2__/ig, configFileName.split('.')[0])
   .replace(/__API_PATH__/ig, baseClassFileName.replace('.js', ''))
+  .replace(/__SERVICE__/ig, serviceLookupKey)
 
-const exampleApiWrkLoc = path.join(serviceHome, 'workers', wrkClassName)
+const apiWrkFilename = 'api.' + baseClassFileName.replace(/\.js$/, '.wrk.js')
+const exampleApiWrkLoc = path.join(serviceHome, 'workers', apiWrkFilename)
 fs.writeFileSync(exampleApiWrkLoc, exampleApiWrkSubst, 'utf8')
-
-
-// WrkUtilNetApi  / __WORKERCLASSNAME__
-// '__CONFIG1__', '__CONFIG_2__' 'util.net', 'util'
-// '__API_PATH__' 'net.util'
 
 
 console.log('')
