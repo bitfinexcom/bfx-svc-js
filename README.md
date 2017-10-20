@@ -34,3 +34,5 @@ All new repositories should inheritate from the closest parent: `bfx-coin-eth-js
 
 * File names: parent is rightmost (i.e `eth.api.coin.wrk.js` : wrk>coin>api>eth)
 * Class names: parent is leftmost (i.e `WkrCoinApiEth`)
+
+Example: [example.js](example.js)
