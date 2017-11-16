@@ -22,7 +22,7 @@
   "engine": {
     "node": ">=8.0"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bitfinexcom/bfx-svc-js.git"
