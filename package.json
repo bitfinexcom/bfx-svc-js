@@ -1,8 +1,7 @@
 {
   "name": "bfx-svc-js",
   "version": "0.0.5",
-  "private": true,
-  "description": "Bitfinex Service",
+  "description": "Bitfinex Base Service",
   "author": {
     "name": "prdn",
     "email": "paolo@bitfinex.com"
