@@ -1,7 +1,31 @@
 'use strict'
 
 const { Grape } = require('grenache-grape')
+const { PeerRPCClient } = require('grenache-nodejs-http')
+const Link = require('grenache-nodejs-link')
+
 const waterfall = require('async/waterfall')
+
+exports.peerRequest = peerRequest
+function peerRequest (serviceName) {
+  const link = new Link({ grape: 'http://127.0.0.1:30001' })
+  link.start()
+  const peer = new PeerRPCClient(link, {})
+  peer.init()
+
+  function _peerRequest (query, cb) {
+    peer.request(serviceName, query, { timeout: 10000 }, (err, data) => {
+      if (err) return cb(err)
+      cb(null, data)
+    })
+  }
+
+  const stop = () => {
+    link.stop()
+    peer.stop()
+  }
+  return { stop: stop, request: _peerRequest }
+}
 
 exports.bootTwoGrapes = bootTwoGrapes
 function bootTwoGrapes (cb) {
